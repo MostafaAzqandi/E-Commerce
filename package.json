@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon src/server.js"
+    "dev": "npx nodemon backend/src/server.js",
+    "data:seed": "node backend/src/seeder.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.7.1"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.5.0"
   }
 }
