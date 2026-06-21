@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import productRouter from "./routes/productRoutes.js"
+import productRoutes from "./routes/productRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.get('/', (req, res) => {
   res.json({ message: 'E-commerce API is running successfully!' });
 });
-app.use("/api/v1/products/", productRouter);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/users", userRoutes);
 
 export default app;
