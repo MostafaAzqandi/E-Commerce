@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
+import Product from '../models/productModel.js';
 
 // @desc    Create new order
 // @route   POST /api/v1/orders
@@ -17,6 +18,23 @@ export const addOrderItems = asyncHandler(async (req, res) => {
   if (orderItems && orderItems.length === 0) {
     res.status(400);
     throw new Error('No order items provided');
+  }
+
+
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+
+    if (!product) {
+      res.status(404);
+      throw new Error(`Product not found for ID: ${item.product}`);
+    }
+
+    if (product.remainings < item.qty) {
+      res.status(400);
+      throw new Error(
+        `Insufficient stock for "${product.title}". Only ${product.remainings} items left, but you requested ${item.qty}.`
+      );
+    }
   }
 
   const order = new Order({
@@ -55,7 +73,7 @@ export const getOrders = asyncHandler(async (req, res) => {
   res.status(200).json(orders);
 });
 
-// @desc    Update order to paid
+// @desc    Update order to paid & decrease product stock
 // @route   PUT /api/v1/orders/:id/pay
 // @access  Private
 export const updateOrderToPaid = asyncHandler(async (req, res) => {
@@ -66,10 +84,9 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
     throw new Error('Order not found');
   }
 
+
   order.isPaid = true;
   order.paidAt = Date.now();
-  
-  // Save details coming from the payment gateway
   order.paymentResult = {
     id: req.body.id,
     status: req.body.status,
@@ -78,5 +95,17 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
   };
 
   const updatedOrder = await order.save();
+
+  const updateStockPromises = order.orderItems.map(async (item) => {
+    await Product.findByIdAndUpdate(
+      item.product, 
+      {
+        $inc: { remainings: -item.qty } 
+      }
+    );
+  });
+
+  await Promise.all(updateStockPromises);
+
   res.status(200).json(updatedOrder);
 });
