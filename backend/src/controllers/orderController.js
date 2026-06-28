@@ -1,25 +1,21 @@
-import asyncHandler from 'express-async-handler';
-import Order from '../models/orderModel.js';
-import Product from '../models/productModel.js';
+import asyncHandler from "express-async-handler";
+import Order from "../models/orderModel.js";
+import Product from "../models/productModel.js";
 
 // @desc    Create new order
 // @route   POST /api/v1/orders
 // @access  Private
 export const addOrderItems = asyncHandler(async (req, res) => {
-  const {
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    itemsPrice,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
+  const { orderItems, shippingAddress, paymentMethod, shippingPrice } =
+    req.body;
 
   if (orderItems && orderItems.length === 0) {
     res.status(400);
-    throw new Error('No order items provided');
+    throw new Error("No order items provided");
   }
 
+  let calculatedItemsPrice = 0;
+  const verifiedOrderItems = [];
 
   for (const item of orderItems) {
     const product = await Product.findById(item.product);
@@ -32,19 +28,37 @@ export const addOrderItems = asyncHandler(async (req, res) => {
     if (product.remainings < item.qty) {
       res.status(400);
       throw new Error(
-        `Insufficient stock for "${product.title}". Only ${product.remainings} items left, but you requested ${item.qty}.`
+        `Insufficient stock for "${product.title}". Only ${product.remainings} items left, but you requested ${item.qty}.`,
       );
     }
+
+    const dbPrice = product.price;
+    calculatedItemsPrice += dbPrice * item.qty;
+
+    verifiedOrderItems.push({
+      title: product.title,
+      qty: item.qty,
+      image:
+        product.productImages && product.productImages.length > 0
+          ? product.productImages[0]
+          : "https://picsum.photos/200",
+      price: dbPrice,
+      product: product._id,
+    });
   }
+
+  const verifiedShippingPrice =
+    shippingPrice !== undefined ? Number(shippingPrice) : 0;
+  const verifiedTotalPrice = calculatedItemsPrice + verifiedShippingPrice;
 
   const order = new Order({
     user: req.user._id,
-    orderItems,
+    orderItems: verifiedOrderItems,
     shippingAddress,
     paymentMethod,
-    itemsPrice,
-    shippingPrice,
-    totalPrice,
+    itemsPrice: calculatedItemsPrice,
+    shippingPrice: verifiedShippingPrice,
+    totalPrice: verifiedTotalPrice,
   });
 
   const createdOrder = await order.save();
@@ -55,11 +69,14 @@ export const addOrderItems = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/orders/:id
 // @access  Private
 export const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate('user', 'firstName lastName email');
+  const order = await Order.findById(req.params.id).populate(
+    "user",
+    "firstName lastName email",
+  );
 
   if (!order) {
     res.status(404);
-    throw new Error('Order not found');
+    throw new Error("Order not found");
   }
 
   res.status(200).json(order);
@@ -69,7 +86,7 @@ export const getOrderById = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/orders
 // @access  Private/Admin
 export const getOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({}).populate('user', 'firstName lastName');
+  const orders = await Order.find({}).populate("user", "firstName lastName");
   res.status(200).json(orders);
 });
 
@@ -81,9 +98,8 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
 
   if (!order) {
     res.status(404);
-    throw new Error('Order not found');
+    throw new Error("Order not found");
   }
-
 
   order.isPaid = true;
   order.paidAt = Date.now();
@@ -97,15 +113,30 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
   const updatedOrder = await order.save();
 
   const updateStockPromises = order.orderItems.map(async (item) => {
-    await Product.findByIdAndUpdate(
-      item.product, 
-      {
-        $inc: { remainings: -item.qty } 
-      }
-    );
+    await Product.findByIdAndUpdate(item.product, {
+      $inc: { remainings: -item.qty },
+    });
   });
 
   await Promise.all(updateStockPromises);
 
   res.status(200).json(updatedOrder);
+});
+
+// @desc    Update order to delivered
+// @route   PUT /api/v1/orders/:id/deliver
+// @access  Private/Admin
+export const updateOrderToDelivered = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    const updatedOrder = await order.save();
+    res.status(200).json(updatedOrder);
+  } else {
+    res.status(404);
+    throw new Error("Order not found");
+  }
 });
