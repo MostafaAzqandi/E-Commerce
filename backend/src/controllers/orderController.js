@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
+import createNotification from "../utils/createNotification.js";
 
 // @desc    Create new order
 // @route   POST /api/v1/orders
@@ -78,6 +79,13 @@ export const getOrderById = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Order not found");
   }
+  const isOwner = order.user._id.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === "admin";
+
+  if (!isOwner && !isAdmin) {
+    res.status(403);
+    throw new Error("Order access denied");
+  }
 
   res.status(200).json(order);
 });
@@ -100,6 +108,14 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Order not found");
   }
+  if (order.user.toString() !== req.user._id.toString()) {
+    res.status(403);
+    throw new Error("Order access denied");
+  }
+  if (order.isPaid) {
+    res.status(400);
+    throw new Error("This order has already been paid for");
+  }
 
   order.isPaid = true;
   order.paidAt = Date.now();
@@ -119,7 +135,12 @@ export const updateOrderToPaid = asyncHandler(async (req, res) => {
   });
 
   await Promise.all(updateStockPromises);
-
+  await createNotification({
+    user: order.user,
+    title: "Payment Received!",
+    message: `Your payment for order #${order._id} was successful. We are packing your items!`,
+    link: `/orders/${order._id}`,
+  });
   res.status(200).json(updatedOrder);
 });
 
@@ -130,10 +151,23 @@ export const updateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    if (order.isDelivered) {
+      res.status(400);
+      throw new Error("Order is already delivered");
+    }
+
     order.isDelivered = true;
     order.deliveredAt = Date.now();
 
     const updatedOrder = await order.save();
+
+    createNotification({
+      user: order.user,
+      title: "Order Delivered!",
+      message: `Great news! Your order #${order._id} has been marked as delivered.`,
+      link: `/orders/${order._id}`,
+    });
+
     res.status(200).json(updatedOrder);
   } else {
     res.status(404);
