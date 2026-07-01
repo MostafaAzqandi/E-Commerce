@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 const PORT = process.env.APP_PORT || 5000;
@@ -13,31 +14,64 @@ const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 global.io = io;
 export const userSocketMap = new Map();
 
-io.on("connection", (socket) => {
-  console.log(`🔌 New client connected: ${socket.id}`);
+io.use((socket, next) => {
+  const rawCookies = socket.handshake.headers.cookie;
 
-  socket.on("setup_session", (userId) => {
-    if (userId) {
-      userSocketMap.set(userId, socket.id);
-      socket.join(userId);
-      console.log(`👤 User ${userId} linked to socket ${socket.id}`);
-    }
-  });
+  if (!rawCookies) {
+    return next(new Error("Authentication error: Cookies missing"));
+  }
+  console.log(rawCookies);
+
+  const cookies = Object.fromEntries(
+    rawCookies.split("; ").map((c) => {
+      const [key, ...v] = c.split("=");
+      return [key, v.join("=")];
+    }),
+  );
+  console.log(cookies);
+
+  const token = cookies.jwt;
+
+  if (!token) {
+    return next(new Error("Authentication error: JWT cookie not found"));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = decoded;
+    next();
+  } catch (error) {
+    return next(new Error("Authentication error: Invalid or expired token"));
+  }
+});
+
+io.on("connection", (socket) => {
+  const userId = socket.user?.userId;
+
+  if (!userId) {
+    console.error(
+      "❌ Auth Error: Could not find userId inside payload structure.",
+    );
+    socket.disconnect(true);
+    return;
+  }
+
+  const userIdStr = userId.toString();
+  console.log(`🔌 Secure client connected: ${socket.id} (User: ${userIdStr})`);
+
+  userSocketMap.set(userIdStr, socket.id);
+  socket.join(userIdStr);
 
   socket.on("disconnect", () => {
-    for (const [userId, socketId] of userSocketMap.entries()) {
-      if (socketId === socket.id) {
-        userSocketMap.delete(userId);
-        console.log(`❌ User ${userId} disconnected`);
-        break;
-      }
-    }
+    userSocketMap.delete(userIdStr);
+    console.log(`❌ User ${userIdStr} disconnected`);
   });
 });
 
