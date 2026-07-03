@@ -79,7 +79,12 @@ const startServer = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB successfully.");
 
-    await redisClient.connect();
+    redisClient
+      .connect()
+      .then(() => console.log("Redis connection initiated..."))
+      .catch((err) =>
+        console.error("Redis background connection failed:", err.message),
+      );
 
     httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

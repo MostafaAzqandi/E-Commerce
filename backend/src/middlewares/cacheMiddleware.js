@@ -38,7 +38,7 @@ export const cacheMiddleware = (ttl = 300) => {
         if (redisClient.isOpen) {
           redisClient
             .setEx(cacheKey, ttl, JSON.stringify(body))
-            .then(() => console.log(`💾 Successfully cached: ${cacheKey}`))
+            .then(() => console.log(`Successfully cached: ${cacheKey}`))
             .catch((err) =>
               console.error("Redis background save error:", err.message),
             );
