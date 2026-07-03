@@ -16,18 +16,18 @@ const createNotification = async ({ user, title, message, link }) => {
 
     if (global.io && targetUserId) {
       console.log(
-        `📡 Sending live WebSocket notification to user: ${targetUserId}`,
+        `Sending live WebSocket notification to user: ${targetUserId}`,
       );
 
       global.io.to(targetUserId).emit("new_notification", notification);
     } else if (!global.io) {
-      console.warn("⚠️ WebSocket server (global.io) is not initialized.");
+      console.warn("WebSocket server (global.io) is not initialized.");
     }
 
     return notification;
   } catch (error) {
     console.error(
-      "❌ Error creating/sending real-time notification:",
+      "Error creating/sending real-time notification:",
       error.message,
     );
     throw error;

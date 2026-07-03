@@ -1,6 +1,7 @@
 import app from "./app.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import redisClient from "./configs/redis.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
@@ -27,7 +28,6 @@ io.use((socket, next) => {
   if (!rawCookies) {
     return next(new Error("Authentication error: Cookies missing"));
   }
-  console.log(rawCookies);
 
   const cookies = Object.fromEntries(
     rawCookies.split("; ").map((c) => {
@@ -35,7 +35,6 @@ io.use((socket, next) => {
       return [key, v.join("=")];
     }),
   );
-  console.log(cookies);
 
   const token = cookies.jwt;
 
@@ -57,7 +56,7 @@ io.on("connection", (socket) => {
 
   if (!userId) {
     console.error(
-      "❌ Auth Error: Could not find userId inside payload structure.",
+      "Auth Error: Could not find userId inside payload structure.",
     );
     socket.disconnect(true);
     return;
@@ -69,9 +68,9 @@ io.on("connection", (socket) => {
   userSocketMap.set(userIdStr, socket.id);
   socket.join(userIdStr);
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (r) => {
     userSocketMap.delete(userIdStr);
-    console.log(`❌ User ${userIdStr} disconnected`);
+    console.log(`❌ User ${userIdStr} disconnected: ${r}`);
   });
 });
 
@@ -79,6 +78,8 @@ const startServer = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to MongoDB successfully.");
+
+    await redisClient.connect();
 
     httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
