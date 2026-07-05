@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { rateLimiterMiddleware } from "./middlewares/rateLimiterMiddleware.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
@@ -14,6 +15,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+app.set("trust proxy", true);
+app.use(rateLimiterMiddleware(60, 100, "global"));
 
 app.get("/", (req, res) => {
   res.json({ message: "E-commerce API is running successfully!" });
