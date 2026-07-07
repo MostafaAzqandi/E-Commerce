@@ -11,7 +11,7 @@ export const rateLimiterMiddleware = (
       const userIp = req.ip.startsWith("::ffff:")
         ? req.ip.split("::ffff:")[1]
         : req.ip;
-      const rateLimitKey = `rate-limit:${prefix}:${userIp}`;
+      const rateLimitKey = `rate-limit-${prefix}:${userIp}`;
       const currentCount = await redisClient.incr(rateLimitKey);
       if (currentCount === 1) {
         console.log(`Ratelimit key created: ${rateLimitKey}`);
