@@ -1,0 +1,676 @@
+{
+  "info": {
+    "_postman_id": "5a141781-a5dd-49e6-8ac2-9dd33b886372",
+    "name": "E-Commerce",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55615813",
+    "_collection_link": "https://go.postman.co/collection/55615813-5a141781-a5dd-49e6-8ac2-9dd33b886372?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User requests",
+      "item": [
+        {
+          "name": "Register a user",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"mosi\",\r\n    \"lastName\":  \"az\",\r\n    \"email\": \"mosi@gmail.com\",\r\n    \"password\": \"55555\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/users",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update a user profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{vault:JWT-Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Mmd\",\r\n    \"lastName\" : \"Jaffar\",\r\n    \"password\" : \"12345\"\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/users/profile",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"mosi@gmail.com\",\r\n    \"password\": \"123451\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/users/login",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get  a user profile",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/users/profile",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Product requests",
+      "item": [
+        {
+          "name": "Update a product",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Football Ball2\",\r\n    \"description\": \"A Big Ball for you\",\r\n    \"price\": 800,\r\n    \"remainings\": 69,\r\n    \"categories\": [\r\n        \"Sports\"\r\n    ],\r\n    \"productImages\": [\r\n        \"https://picsum.photos/seed/7vz6n1/629/3785\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/products/6a37acb9d01321c467b308b3",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "6a37acb9d01321c467b308b3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{vault:JWT-Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/products/6a379c2bb5bfc124d704b0b7",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "6a379c2bb5bfc124d704b0b7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create a product",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Football Ball redis\",\r\n    \"description\": \"A Big Ball for you\",\r\n    \"price\": 800,\r\n    \"remainings\": 69,\r\n    \"categories\": [\r\n        \"Sports\",\r\n        \"Electronics\"\r\n    ],\r\n    \"productImages\": [\r\n        \"https://picsum.photos/seed/7vz6n1/629/3785\"\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/products",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var template = `",
+                  "<style>",
+                  "  body { font-family: Arial, sans-serif; padding: 10px; }",
+                  "  h2 { color: #333; }",
+                  "  table { border-collapse: collapse; width: 100%; }",
+                  "  th { background-color: #FF6C37; color: white; padding: 10px 14px; text-align: left; }",
+                  "  td { padding: 8px 14px; border-bottom: 1px solid #ddd; vertical-align: top; }",
+                  "  tr:hover { background-color: #f5f5f5; }",
+                  "  .badge {",
+                  "    display: inline-block;",
+                  "    background: #eee;",
+                  "    border-radius: 4px;",
+                  "    padding: 2px 8px;",
+                  "    margin: 2px;",
+                  "    font-size: 12px;",
+                  "    color: #555;",
+                  "  }",
+                  "  .price { font-weight: bold; color: #2a9d8f; }",
+                  "  .low-stock { color: #e63946; font-weight: bold; }",
+                  "</style>",
+                  "",
+                  "<h2>Products ({{count}} items)</h2>",
+                  "<table>",
+                  "  <thead>",
+                  "    <tr>",
+                  "      <th>#</th>",
+                  "      <th>Title</th>",
+                  "      <th>Price</th>",
+                  "      <th>Stock</th>",
+                  "      <th>Categories</th>",
+                  "    </tr>",
+                  "  </thead>",
+                  "  <tbody>",
+                  "    {{#each products}}",
+                  "    <tr>",
+                  "      <td>{{index}}</td>",
+                  "      <td>{{title}}</td>",
+                  "      <td class=\"price\">\\${{price}}</td>",
+                  "      <td class=\"{{stockClass}}\">{{remainings}}</td>",
+                  "      <td>{{#each categories}}<span class=\"badge\">{{this}}</span>{{/each}}</td>",
+                  "    </tr>",
+                  "    {{/each}}",
+                  "  </tbody>",
+                  "</table>",
+                  "`;",
+                  "",
+                  "try {",
+                  "  var products = pm.response.json();",
+                  "  var data = {",
+                  "    count: products.length,",
+                  "    products: products.map(function(p, i) {",
+                  "      return {",
+                  "        index: i + 1,",
+                  "        title: p.title,",
+                  "        price: p.price.toFixed(2),",
+                  "        remainings: p.remainings,",
+                  "        stockClass: p.remainings <= 10 ? 'low-stock' : '',",
+                  "        categories: p.categories",
+                  "      };",
+                  "    })",
+                  "  };",
+                  "  pm.visualizer.set(template, data);",
+                  "} catch (e) {",
+                  "  pm.visualizer.set('<p style=\"color:red\">Error rendering visualization: ' + e.message + '</p>');",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/products/6a37acb9d01321c467b308b4",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "6a37acb9d01321c467b308b4"
+              ],
+              "query": [
+                {
+                  "key": "pageNumber",
+                  "value": "15",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get a product with id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/products/6a379c0d246e724f9a0a6ae3",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "6a379c0d246e724f9a0a6ae3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Order requests",
+      "item": [
+        {
+          "name": "Update order to paid",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"PAYID-NOCK_TRANSACTION_12345\",\r\n    \"status\": \"COMPLETED\",\r\n    \"update_time\": \"2026-06-23T12:00:00Z\",\r\n    \"email_address\": \"buyer@example.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/orders/6a415ee5462581be942d7b30/pay",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                "6a415ee5462581be942d7b30",
+                "pay"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create an order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{vault:JWT-Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"orderItems\": [\r\n        {\r\n            \"product\": \"6a37acb9d01321c467b308b3\",\r\n            \"qty\": 1\r\n        }\r\n    ],\r\n    \"shippingAddress\": {\r\n        \"address\": \"123 Dev Lane\",\r\n        \"city\": \"Frankfurt\",\r\n        \"postalCode\": \"60311\",\r\n        \"country\": \"Germany\"\r\n    },\r\n    \"paymentMethod\": \"PayPal\",\r\n    \"shippingPrice\": 15\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/orders",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get an order",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/orders/6a415ee5462581be942d7b30",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                "6a415ee5462581be942d7b30"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/orders",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update order to delivered",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/orders/6a3c19b03f0945508fc0bd46/deliver",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                "6a3c19b03f0945508fc0bd46",
+                "deliver"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin requests",
+      "item": [
+        {
+          "name": "Get dashboard stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/admin/stats",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications requests",
+      "item": [
+        {
+          "name": "Get user's notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/notifications",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cart requests",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"items\": [\r\n    {\r\n      \"productId\": \"6a379c0d246e724f9a0a6ae3\", \r\n      \"quantity\": 5\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "127.0.0.1:3001/api/v1/cart",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "3001",
+              "path": [
+                "api",
+                "v1",
+                "cart"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

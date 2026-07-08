@@ -1,5 +1,6 @@
 import Product from "../models/productModel.js";
 import asyncHandler from "express-async-handler";
+import { clearCache } from "../utils/clearCache.js";
 
 // @desc    Fetch all products with search, filtering, and pagination
 // @route   GET /api/v1/products
@@ -76,6 +77,9 @@ export const createProduct = asyncHandler(async (req, res) => {
   });
 
   const createdProduct = await product.save();
+
+  await clearCache("cache:/api/v1/products*");
+
   res.status(201).json(createdProduct);
 });
 
@@ -90,6 +94,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   );
 
   if (updatedProduct) {
+    await clearCache("cache:/api/v1/products*");
     return res.status(200).json(updatedProduct);
   } else {
     res.status(404);
@@ -104,6 +109,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   const deletedProduct = await Product.findByIdAndDelete(req.params.id);
 
   if (deletedProduct) {
+    await clearCache("cache:/api/v1/products*");
     return res.status(200).json({ message: "Product successfully removed" });
   } else {
     res.status(404);

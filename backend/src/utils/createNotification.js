@@ -1,19 +1,37 @@
-// backend/src/services/notificationService.js
 import Notification from "../models/notificationModel.js";
 
 /**
- * Global utility to create background user notifications
- * @param {Object} params
- * @param {string} params.user - The target user ObjectId
- * @param {string} params.title - Notification header
- * @param {string} params.message - Detailed body text
- * @param {string} [params.link] - Optional frontend routing target redirect URL
+ * Global utility to create background user notifications and emit them via WebSockets
  */
 const createNotification = async ({ user, title, message, link }) => {
   try {
-    await Notification.create({ user, title, message, link });
+    const notification = await Notification.create({
+      user,
+      title,
+      message,
+      link,
+    });
+
+    const targetUserId = user?.toString();
+
+    if (global.io && targetUserId) {
+      console.log(
+        `Sending live WebSocket notification to user: ${targetUserId}`,
+      );
+
+      global.io.to(targetUserId).emit("new_notification", notification);
+    } else if (!global.io) {
+      console.warn("WebSocket server (global.io) is not initialized.");
+    }
+
+    return notification;
   } catch (error) {
-    console.error(`Notification failed to dispatch: ${error.message}`);
+    console.error(
+      "Error creating/sending real-time notification:",
+      error.message,
+    );
+    throw error;
   }
 };
+
 export default createNotification;
